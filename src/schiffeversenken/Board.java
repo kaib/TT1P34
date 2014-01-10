@@ -1,3 +1,8 @@
+
+// Diese Klasse enthällt das Spielfeld. Der aktuelle Spielstand wird mit der Update Methode festgehalten.
+
+
+
 package schiffeversenken;
 
 import java.util.ArrayList;
@@ -15,8 +20,8 @@ public class Board {
 	private Map<ID, Integer> lifes;
 	private ID me;
 	private List<ID> opponents;
-	public static final int MAX_FIELDS =100;
-	private int numberOfShips = 10;
+	public static final int MAX_FIELDS =15;
+	private int numberOfShips = 1;
 	private List<Integer> ownShips;
 
 	public Board(ID me, List<ID> players) {
@@ -29,7 +34,8 @@ public class Board {
 			lifes.put(opponent, numberOfShips);
 		}
 		// TODO setzstrategie
-		ownShips = Arrays.asList(0,7,8,49,55,56,70,82,83,99);
+//		ownShips = Arrays.asList(0,7,8,49,55,56,70,82,83,99);
+		ownShips = Arrays.asList(2);
 	}
 
 	public List<Integer> getRemainingTargets(ID opponent) {
@@ -49,19 +55,18 @@ public class Board {
 			if ((entry.getValue() < shipCount) && !(entry.getKey().equals(me)) && (entry.getValue() > 0)) {
 				shipCount = entry.getValue();
 				target = entry.getKey();
-				System.out.println("Target: " + target);
 			}
 		}
 		return target;
 	}
 
 	public ID getPredecessorNodeID(ID node) {
-		List<ID> allNodes = opponents;
-		int index = allNodes.indexOf(node);
+		List<ID> succNodes = opponents;
+		int index = succNodes.indexOf(node);
 		if (index == 0) {
-			return allNodes.get(allNodes.size() - 1);
+			return succNodes.get(succNodes.size() - 1);
 		} else {
-			return allNodes.get(index - 1);
+			return succNodes.get(index - 1);
 		}
 	}
 

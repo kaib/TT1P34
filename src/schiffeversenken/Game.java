@@ -1,3 +1,5 @@
+//Main zum starten der Tests. Konfiguration über static parameter
+
 package schiffeversenken;
 
 import java.net.InetAddress;
@@ -19,6 +21,9 @@ public class Game implements NotifyCallback {
 	Board board;
 	Strategie strategie;
 	Logger logger;
+	private static int numberOfPlayers = 3;
+	private static int INIT_TIME = 1000;
+	private static int NETWORK_TIME = 10000;
 
 	// public static final Logger logger =
 	// Logger.getLogger(Game.class.getName());
@@ -83,13 +88,13 @@ public class Game implements NotifyCallback {
 		Game game = new Game(startPort, startPort, true);
 		List<Game> players = new LinkedList<Game>();
 		players.add(game);
-		for (int i = 1; i <= 2; i++) {
+		for (int i = 1; i <= numberOfPlayers - 1; i++) {
 			players.add(new Game(startPort + i, startPort, false));
 		}
 
 		try {
 			System.out.println("now sleep");
-			Thread.sleep(10000);
+			Thread.sleep(NETWORK_TIME);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -100,7 +105,7 @@ public class Game implements NotifyCallback {
 		}
 		try {
 			System.out.println("now sleep");
-			Thread.sleep(1000);
+			Thread.sleep(INIT_TIME);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -158,8 +163,9 @@ public class Game implements NotifyCallback {
 		try {
 			targetNode = chord.getFingerTable().get(0).findSuccessor(target)
 					.getNodeID();
-			System.out.println("[Game] ID: " + chord.getID()
-					+ " schießt auf ID: " + targetNode + " Feld: " + target);
+			System.out.println("[Game] ID: " + chord.getID().toBigInteger()
+					+ " schießt auf ID: " + targetNode.toBigInteger()
+					+ " Feld: " + target.toBigInteger());
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -181,6 +187,7 @@ public class Game implements NotifyCallback {
 			opponents.add(node);
 
 			try {
+
 				node = chord.getFingerTable().get(0)
 						.findSuccessor(node.addPowerOfTwo(0)).getNodeID();
 			} catch (CommunicationException e) {
@@ -195,7 +202,6 @@ public class Game implements NotifyCallback {
 	public void retrieved(ID target) {
 		boolean hit = board.isHit(target);
 		logger.debug("RetrievedCallback with Target: " + target);
-		System.out.println("Dead? " + board.areWeDeadYet());
 		this.chord.broadcast(target, hit);
 		if (board.haveWon()) {
 			System.out.println("###############Gewonnen Retrieved"

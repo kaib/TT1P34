@@ -1120,7 +1120,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		this.logger.error("test");
 		//Get max Transaction ID +1 for new max transaction ID
 		int transactionID = this.localNode.getTransactionID() + 1;
-		
+		//Broadcast to all Nodes including the own node
 		try {
 			this.localNode.broadcast(new Broadcast(this.localID,this.localID,target,transactionID,hit));
 		} catch (CommunicationException e) {

@@ -69,12 +69,12 @@ public final class NodeImpl extends Node {
 	private ChordImpl impl;
 
 	/**
-	 * Object logger.
-	 * The name of the logger is the name of this class with the nodeID appended. 
-	 * The length of the nodeID depends on the number of bytes that are displayed 
-	 * when the ID is shown in Hex-Representation. See documentation of {@link ID}. 
-	 * E.g. de.uniba.wiai.lspi.chord.service.impl.NodeImpl.FF FF FF FF if the number 
-	 * of displayed Bytes of an ID is 4. 
+	 * Object logger. The name of the logger is the name of this class with the
+	 * nodeID appended. The length of the nodeID depends on the number of bytes
+	 * that are displayed when the ID is shown in Hex-Representation. See
+	 * documentation of {@link ID}. E.g.
+	 * de.uniba.wiai.lspi.chord.service.impl.NodeImpl.FF FF FF FF if the number
+	 * of displayed Bytes of an ID is 4.
 	 */
 	private Logger logger;
 
@@ -94,10 +94,10 @@ public final class NodeImpl extends Node {
 	 * this node.
 	 */
 	private Executor asyncExecutor;
-	
-	private Lock notifyLock; 
-	
-	private int transactionID =0;
+
+	private Lock notifyLock;
+
+	private int transactionID = 0;
 
 	/**
 	 * Creates that part of the local node which answers remote requests by
@@ -116,16 +116,18 @@ public final class NodeImpl extends Node {
 	 * @throws IllegalArgumentException
 	 *             If any of the parameter has value <code>null</code>.
 	 */
-	NodeImpl(ChordImpl impl, ID nodeID, URL nodeURL, NotifyCallback nodeCallback, References references,
-			Entries entries) {
+	NodeImpl(ChordImpl impl, ID nodeID, URL nodeURL,
+			NotifyCallback nodeCallback, References references, Entries entries) {
 
 		if (impl == null || nodeID == null || nodeURL == null
-				|| references == null || entries == null || nodeCallback == null) {
+				|| references == null || entries == null
+				|| nodeCallback == null) {
 			throw new IllegalArgumentException(
 					"Parameters of the constructor may not have a null value!");
 		}
 
-		this.logger = Logger.getLogger(NodeImpl.class.getName() + "." + nodeID.toString());
+		this.logger = Logger.getLogger(NodeImpl.class.getName() + "."
+				+ nodeID.toString());
 
 		this.impl = impl;
 		this.asyncExecutor = impl.getAsyncExecutor();
@@ -134,8 +136,8 @@ public final class NodeImpl extends Node {
 		this.notifyCallback = nodeCallback;
 		this.references = references;
 		this.entries = entries;
-		this.notifyLock = new ReentrantLock(true); 
-		
+		this.notifyLock = new ReentrantLock(true);
+
 		// create endpoint for incoming connections
 		this.myEndpoint = Endpoint.createEndpoint(this, nodeURL);
 		this.myEndpoint.listen();
@@ -171,9 +173,10 @@ public final class NodeImpl extends Node {
 	@Override
 	public final List<Node> notify(Node potentialPredecessor) {
 		/*
-		 * Mutual exclusion between notify and notifyAndCopyEntries. 17.03.2008. sven.
+		 * Mutual exclusion between notify and notifyAndCopyEntries. 17.03.2008.
+		 * sven.
 		 */
-		this.notifyLock.lock(); 
+		this.notifyLock.lock();
 		try {
 			// the result will contain the list of successors as well as the
 			// predecessor of this node
@@ -183,17 +186,17 @@ public final class NodeImpl extends Node {
 			if (this.references.getPredecessor() != null) {
 				result.add(this.references.getPredecessor());
 			} else {
-				result.add(potentialPredecessor); 
+				result.add(potentialPredecessor);
 			}
 			result.addAll(this.references.getSuccessors());
 
-//			 add potential predecessor to successor list and finger table and
+			// add potential predecessor to successor list and finger table and
 			// set
 			// it as predecessor if no better predecessor is available
-			this.references.addReferenceAsPredecessor(potentialPredecessor);			
+			this.references.addReferenceAsPredecessor(potentialPredecessor);
 			return result;
 		} finally {
-			this.notifyLock.unlock(); 
+			this.notifyLock.unlock();
 		}
 	}
 
@@ -204,9 +207,10 @@ public final class NodeImpl extends Node {
 	public final RefsAndEntries notifyAndCopyEntries(Node potentialPredecessor)
 			throws CommunicationException {
 		/*
-		 * Mutual exclusion between notify and notifyAndCopyEntries. 17.03.2008. sven.
+		 * Mutual exclusion between notify and notifyAndCopyEntries. 17.03.2008.
+		 * sven.
 		 */
-		this.notifyLock.lock(); 
+		this.notifyLock.lock();
 		try {
 			// copy all entries which lie between the local node ID and the ID
 			// of
@@ -218,7 +222,7 @@ public final class NodeImpl extends Node {
 			return new RefsAndEntries(this.notify(potentialPredecessor),
 					copiedEntries);
 		} finally {
-			this.notifyLock.unlock(); 
+			this.notifyLock.unlock();
 		}
 	}
 
@@ -247,7 +251,7 @@ public final class NodeImpl extends Node {
 				|| !toInsert.getId().isInInterval(
 						this.references.getPredecessor().getNodeID(),
 						this.nodeID)) {
-			this.references.getPredecessor().insertEntry(toInsert); 
+			this.references.getPredecessor().insertEntry(toInsert);
 			return;
 		}
 
@@ -379,9 +383,10 @@ public final class NodeImpl extends Node {
 
 		// Possible, but rare situation: a new node has joined which now is
 		// responsible for the id!
-		if ( (this.references.getPredecessor() != null)
-			  && (!id.isInInterval(this.references.getPredecessor().getNodeID(), this.nodeID)) 
-			  && (!this.nodeID.equals(id)) ) {
+		if ((this.references.getPredecessor() != null)
+				&& (!id.isInInterval(this.references.getPredecessor()
+						.getNodeID(), this.nodeID))
+				&& (!this.nodeID.equals(id))) {
 			this.logger.fatal("The rare situation has occured at time "
 					+ System.currentTimeMillis() + ", id to look up=" + id
 					+ ", id of local node=" + this.nodeID
@@ -428,75 +433,78 @@ public final class NodeImpl extends Node {
 	final Executor getAsyncExecutor() {
 		return this.asyncExecutor;
 	}
-	
+
 	// TODO: implement this function in TTP
 	@Override
 	public final void broadcast(Broadcast info) throws CommunicationException {
 		if (this.logger.isEnabledFor(DEBUG)) {
 			this.logger.debug(" Send broadcast message NODEIMPL");
 		}
-		System.out.println("Transaction: " + info.getTransaction() + " Node: " + this.getNodeID());
-		if(info.getTransaction() > transactionID) transactionID = info.getTransaction();
-		//maybe check transaction ID if already received
-		
-		
+		System.out.println("Transaction: " + info.getTransaction() + " Node: "
+				+ this.getNodeID());
+		if (info.getTransaction() > transactionID)
+			transactionID = info.getTransaction();
+		// maybe check transaction ID if already received
 		List<Node> nodesToBroadcast = getNodesToBroadcast(info);
-		logger.debug("NODEIMPL: Sorted List of Nodes to Broadcast to: " + nodesToBroadcast);
-		for(int i = 0; i< nodesToBroadcast.size() -1; i++) {
-			//Calculating range to next Finger Table entry
-			Broadcast newInfo = new Broadcast(nodesToBroadcast.get(i+1).getNodeID(), info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());
+		logger.debug("NODEIMPL: Sorted List of Nodes to Broadcast to: "
+				+ nodesToBroadcast);
+		for (int i = 0; i < nodesToBroadcast.size() - 1; i++) {
+			// Calculating range to next Finger Table entry
+			Broadcast newInfo = new Broadcast(nodesToBroadcast.get(i + 1)
+					.getNodeID(), info.getSource(), info.getTarget(),
+					info.getTransaction(), info.getHit());
 			nodesToBroadcast.get(i).broadcast(newInfo);
-			logger.debug("Broadcast to Node: " + nodesToBroadcast.get(i) + " with Info: " + newInfo);
+			logger.debug("Broadcast to Node: " + nodesToBroadcast.get(i)
+					+ " with Info: " + newInfo);
 		}
-		//Broadcast to last node in finger Table with old info
-		if(!nodesToBroadcast.isEmpty()){
-			nodesToBroadcast.get(nodesToBroadcast.size()-1).broadcast(info);
+		// Broadcast to last node in finger Table with old info
+		if (!nodesToBroadcast.isEmpty()) {
+			nodesToBroadcast.get(nodesToBroadcast.size() - 1).broadcast(info);
 		}
-		System.out.println("Callback: " + notifyCallback);
 		// finally inform application
 		if (this.notifyCallback != null) {
-			System.out.println("Callback");
-			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit());
+			this.notifyCallback.broadcast(info.getSource(), info.getTarget(),
+					info.getHit());
 		}
 	}
-	
+
 	public int getTransactionID() {
 		return transactionID;
 	}
-	
+
 	private final List<Node> getNodesToBroadcast(Broadcast info) {
+
 		ID toID = info.getRange();
 		ID localID = impl.getID();
 		List<Node> beforeZero = new LinkedList<Node>();
 		List<Node> afterZero = new LinkedList<Node>();
 		List<Node> nodesToBroadcast = new LinkedList<Node>();
-		
-		//Check finger table
-		for(Node node : impl.getFingerTable()){
-			//Node is not sorted in and in range of localID and toID
-			if(!beforeZero.contains(node) && !afterZero.contains(node) && node.getNodeID().isInInterval(localID, toID)) {
-				//Need to check for crossing the zero
-				//If Id is bigger than local id, it is before zero, else after zero
-				if(node.getNodeID().compareTo(localID) > 0) {
+
+		// Check finger table
+		for (Node node : impl.getFingerTable()) {
+			// Node is not sorted in and in range of localID and toID
+			if (!beforeZero.contains(node) && !afterZero.contains(node)
+					&& node.getNodeID().isInInterval(localID, toID)) {
+				// Need to check for crossing the zero
+				// If Id is bigger than local id, it is before zero, else after
+				// zero
+				if (node.getNodeID().compareTo(localID) > 0) {
 					beforeZero.add(node);
-				} else if(node.getNodeID().compareTo(localID) < 0) {
+				} else if (node.getNodeID().compareTo(localID) < 0) {
 					afterZero.add(node);
 				} else {
 					System.out.println("Something Wrong");
 					logger.error("Local ID is equal to node ID, something is wrong");
 				}
-			} else {
-				System.out.println("Not in Intervall");
 			}
 		}
-		//Sort collections for later use
+		// Sort collections for later use
 		Collections.sort(beforeZero);
 		Collections.sort(afterZero);
-		
+
 		nodesToBroadcast.addAll(beforeZero);
 		nodesToBroadcast.addAll(afterZero);
 		// Now zero crossings are correctly handeld
-		System.out.println("BroadcastNodes " + nodesToBroadcast);
 		return nodesToBroadcast;
 	}
 

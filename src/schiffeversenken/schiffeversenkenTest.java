@@ -3,6 +3,8 @@ package schiffeversenken;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.util.Date;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -42,9 +44,13 @@ public class schiffeversenkenTest {
 	public void testFieldSize2() {
 		BigInteger int1 = IdConverter.maxIDBigInt.subtract(BigInteger.valueOf(100));
 		BigInteger int2 = BigInteger.valueOf(1000);
+		BigInteger int3 = BigInteger.valueOf(100);
 		BigInteger target = BigInteger.valueOf(11);
+		BigInteger target2 = BigInteger.valueOf(50);
 		
+		assertEquals(target, IdConverter.getFieldSize(ID.valueOf(int1), ID.valueOf(int2), 100));
 		assertEquals(target,IdConverter.getFieldSize(int1, int2,100));
+		assertEquals(target2,IdConverter.getFieldSize(int1, int3,4));
 	}
 	
 	@Test
@@ -105,6 +111,8 @@ public class schiffeversenkenTest {
 		assertEquals(-1 , IdConverter.IDtoField(start, end, start,100));
 	}
 	
+	
+	
 	@Test
 	public void testFieldToIDAllPositive() {
 		
@@ -132,12 +140,23 @@ public class schiffeversenkenTest {
 		BigInteger target3 =  BigInteger.valueOf(95);
 		BigInteger target4 =  BigInteger.valueOf(91);
 		
+	
+		System.out.println("minustest: " + target.subtract(start.subtract(IdConverter.maxIDBigInt)));
+		
+		BigInteger start2 = IdConverter.maxIDBigInt.subtract(BigInteger.valueOf(100));
+		BigInteger end2 = BigInteger.valueOf(300);
+		BigInteger target6 =  IdConverter.maxIDBigInt.subtract(BigInteger.valueOf(49));
+		
+		
 		
 		assertEquals(target , IdConverter.FieldToId(end, start, 0,100));
 		assertEquals(target1 ,IdConverter.FieldToId(end, start, 1,100));
 		assertEquals(target2 ,IdConverter.FieldToId(end, start, 99,100));
 		assertEquals(target3 , IdConverter.FieldToId(end, start, 98,100));
 		assertEquals(target4 , IdConverter.FieldToId(end, start, 97,100));
+	
+		
+		assertEquals(target6, IdConverter.FieldToId(end2, start2, 0, 4));
 		
 	}
 	
@@ -147,7 +166,9 @@ public class schiffeversenkenTest {
 		assertEquals(0,b[0] );
 		assertEquals(-1,b[1]);
 		assertEquals(1,b[2]);
+		assertEquals(20, IdConverter.b.length);
 		assertEquals(21, IdConverter.maxIDBigInt.toByteArray().length);
+		assertEquals(1,BigInteger.valueOf(90).divide(BigInteger.valueOf(50)).intValue());
 	}
 
 }

@@ -1,3 +1,6 @@
+//Diese Klasse enthält die Spielstrategie. Durch den Aufruf von nextTarget, wird der nächste Gegner inklusive Angriffsfeld berechnet
+//Strategie: Schwächster Gegner, random Schuss auf nicht beschossene
+
 package schiffeversenken;
 
 import java.util.List;
@@ -12,12 +15,13 @@ public class Strategie {
 	}
 
 	public ID nextTarget() {
-		// strategie: SChwächster gegner, random Schuss auf nicht beschossene
+		
 		ID opponent = board.getLowestOpponent();
 		
 		List<Integer> remainingTargets = board.getRemainingTargets(opponent);
 		
 		int random = (int)( Math.random() * (remainingTargets.size() -1));
+		System.out.println("TargetFiel: " + remainingTargets.get(random));
 		return IdConverter.FieldToId(opponent, board.getPredecessorNodeID(opponent), remainingTargets.get(random),board.MAX_FIELDS);
 	}
 }
